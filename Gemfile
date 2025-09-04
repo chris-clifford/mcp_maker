@@ -40,8 +40,10 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
-# Model Context Protocol Ruby SDK
-gem "mcp"
+# Model Context Protocol Ruby SDKs
+# fast-mcp provides Rails integration, tools, and resources per MCP_README.md
+gem "fast-mcp"
+# Optionally keep the generic mcp gem if used elsewhere
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

@@ -11,4 +11,7 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # MCP status/index endpoint
+  get '/mcp' => 'mcp#index'
 end
