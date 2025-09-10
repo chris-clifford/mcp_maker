@@ -1,0 +1,67 @@
+<% app_name = Rails.application.class.module_parent_name.underscore.dasherize %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New – MCP – <%= app_name %></title>
+    <style>
+      :root { --fg:#222; --muted:#666; --bg:#fafafa; --card:#fff; --accent:#0b5fff; }
+      body { margin:0; font:14px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--fg); background:var(--bg); }
+      header { padding:16px 20px; background:#fff; border-bottom:1px solid #eee; position:sticky; top:0; }
+      main { padding:24px 20px; max-width:800px; margin:0 auto; }
+      .card { background:var(--card); border:1px solid #eee; border-radius:8px; padding:16px; }
+      label { display:block; font-weight:600; margin:12px 0 6px; }
+      input[type=text], textarea, select { width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:6px; }
+      textarea { min-height:110px; }
+      .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+      .actions { margin-top:16px; display:flex; gap:10px; }
+      .btn { background:var(--accent); color:#fff; padding:8px 12px; border-radius:8px; border:0; cursor:pointer; font-weight:600; }
+      .btn.secondary { background:#f3f3f3; color:#333; border:1px solid #e5e5e5; }
+      a { color:var(--accent); text-decoration:none; }
+      .back { font-size:13px; color:var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div><a class="back" href="<%= url_for(controller: :dashboard, action: :index) %>">← Back to dashboard</a></div>
+      <h1 style="margin:8px 0 0;">Create new item</h1>
+      <div class="meta" style="color:var(--muted);">Mock form – no submission yet</div>
+    </header>
+    <main>
+      <div class="card">
+        <%= form_with url: '#', method: :post, local: true do |f| %>
+          <label for="kind">Type</label>
+          <select id="kind" name="kind">
+            <option value="tool">Tool</option>
+            <option value="resource">Resource</option>
+            <option value="prompt">Prompt</option>
+            <option value="schema">Schema</option>
+          </select>
+
+          <div class="row">
+            <div>
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" placeholder="e.g., AddNumbersTool or PopularUsers" />
+            </div>
+            <div>
+              <label for="identifier">Identifier / URI</label>
+              <input type="text" id="identifier" name="identifier" placeholder="e.g., myapp:///users/{id}" />
+            </div>
+          </div>
+
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="What does this item do?"></textarea>
+
+          <label for="extras">Arguments / Schema / Notes</label>
+          <textarea id="extras" name="extras" placeholder="JSON schema, argument list, or any notes"></textarea>
+
+          <div class="actions">
+            <button type="submit" class="btn" onclick="return false;">Save (mock)</button>
+            <%= link_to 'Cancel', url_for(controller: :dashboard, action: :index), class: 'btn secondary', onclick: 'return true;' %>
+          </div>
+        <% end %>
+      </div>
+    </main>
+  </body>
+  </html>

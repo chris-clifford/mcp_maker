@@ -1,0 +1,149 @@
+<%# Basic MCP server UI: lists tools, resources, prompts, schemas %>
+<% app_name = Rails.application.class.module_parent_name.underscore.dasherize %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MCP – <%= app_name %></title>
+    <style>
+      :root { --fg:#222; --muted:#666; --bg:#fafafa; --card:#fff; --accent:#0b5fff; }
+      body { margin:0; font:14px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--fg); background:var(--bg); }
+      header { padding:16px 20px; background:#fff; border-bottom:1px solid #eee; position:sticky; top:0; }
+      header h1 { margin:0; font-size:18px; }
+      header .meta { color:var(--muted); font-size:13px; }
+      main { padding:24px 20px; max-width:960px; margin:0 auto; }
+      .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+      .card { background:var(--card); border:1px solid #eee; border-radius:8px; padding:14px; }
+      .card h2 { margin:0 0 8px; font-size:16px; }
+      .item { padding:8px 0; border-top:1px dashed #eee; }
+      .item:first-child { border-top:0; }
+      .name { font-weight:600; }
+      .desc { color:var(--muted); }
+      .empty { color:var(--muted); font-style:italic; }
+      .badge { display:inline-block; background:#eef3ff; color:var(--accent); border:1px solid #dbe6ff; padding:2px 6px; border-radius:999px; font-size:12px; }
+      .badge.ok { background:#eaf7e8; color:#2f8132; border-color:#cde9c9; }
+      .badge.err { background:#fde8e8; color:#c81e1e; border-color:#f8b4b4; }
+      .endpoints { margin-top:8px; font-size:13px; color:var(--muted); }
+      code { background:#f3f3f3; padding:1px 4px; border-radius:4px; }
+    </style>
+  </head>
+  <body>
+    <header style="display:flex; align-items:flex-start; gap:16px;">
+      <div style="flex:1 1 auto;">
+        <h1 style="display:inline-block; margin-right:12px;">MCP Server – <%= app_name %></h1>
+        <span class="meta">Version <code>1.0.0</code></span>
+        <div class="endpoints">
+          Endpoints:
+          <code>/mcp/messages</code>, <code>/mcp/sse</code>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;">
+        <%= link_to 'new +', new_dashboard_path, class: 'new-btn' %>
+      </div>
+      <style>
+        .new-btn{ text-decoration:none; background:var(--accent); color:#fff; padding:8px 12px; border-radius:8px; font-weight:600; display:inline-block; }
+        .new-btn:hover{ filter:brightness(0.95); }
+      </style>
+    </header>
+    <main>
+      <div class="grid">
+        <section class="card">
+          <h2>DB Tools <span class="badge"><%= @db_tools.size %></span></h2>
+          <% if @db_tools.any? %>
+            <% @db_tools.each do |tool| %>
+              <div class="item">
+                <div class="name">
+                  Tool #<%= tool.id %>
+                  <%= schema_status_badge(tool) %>
+                </div>
+                <% if tool.description.present? %>
+                  <div class="desc"><%= tool.description %></div>
+                <% end %>
+                <% if tool.call_action.present? %>
+                  <div class="desc">
+                    <strong>Call Action:</strong>
+                    <pre style="white-space:pre-wrap; background:#f9f9f9; border:1px solid #eee; padding:8px; border-radius:6px;"><%= tool.call_action %></pre>
+                  </div>
+                <% end %>
+                <div class="desc">
+                  <strong>Arguments:</strong>
+                  <pre style="white-space:pre-wrap; background:#f9f9f9; border:1px solid #eee; padding:8px; border-radius:6px;"><%= pretty_json(tool.arguments) %></pre>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="empty">No DB tools found.</div>
+          <% end %>
+        </section>
+
+        <section class="card">
+          <h2>Tools <span class="badge"><%= @tools.size %></span></h2>
+          <% if @tools.any? %>
+            <% @tools.each do |t| %>
+              <div class="item">
+                <div class="name"><%= t[:name] %></div>
+                <% if t[:description].present? %>
+                  <div class="desc"><%= t[:description] %></div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="empty">No tools discovered.</div>
+          <% end %>
+        </section>
+
+        <section class="card">
+          <h2>Resources <span class="badge"><%= @resources.size %></span></h2>
+          <% if @resources.any? %>
+            <% @resources.each do |r| %>
+              <div class="item">
+                <div class="name"><%= r[:name] %></div>
+                <% if r[:uri].present? %>
+                  <div class="desc"><code><%= r[:uri] %></code></div>
+                <% end %>
+                <% if r[:description].present? %>
+                  <div class="desc"><%= r[:description] %></div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="empty">No resources discovered.</div>
+          <% end %>
+        </section>
+
+        <section class="card">
+          <h2>Prompts <span class="badge"><%= @prompts.size %></span></h2>
+          <% if @prompts.any? %>
+            <% @prompts.each do |p| %>
+              <div class="item">
+                <div class="name"><%= p[:name] %></div>
+                <% if p[:description].present? %>
+                  <div class="desc"><%= p[:description] %></div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="empty">No prompts available.</div>
+          <% end %>
+        </section>
+
+        <section class="card">
+          <h2>Schemas <span class="badge"><%= @schemas.size %></span></h2>
+          <% if @schemas.any? %>
+            <% @schemas.each do |s| %>
+              <div class="item">
+                <div class="name"><%= s[:name] %></div>
+                <% if s[:description].present? %>
+                  <div class="desc"><%= s[:description] %></div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="empty">No schemas available.</div>
+          <% end %>
+        </section>
+      </div>
+    </main>
+  </body>
+  </html>
