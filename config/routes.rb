@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  # MCP status/index endpoint
-  get '/mcp' => 'mcp#index'
+  # Dashboard
+  get '/' => 'dashboard#index'
+  get '/dashboard/new' => 'dashboard#new', as: :new_dashboard
 end
